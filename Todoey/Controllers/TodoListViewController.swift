@@ -10,27 +10,10 @@ class TodoListViewController: UITableViewController{
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
+
         print(dataFilePath)
-//
-//        var newItem = Item()
-//        newItem.itemName = "Find Mike"
-//        itemArray.append(newItem)
-//
-//        var newItem2 = Item()
-//        newItem2.itemName = "Find Mike2"
-//        itemArray.append(newItem2)
-//
-//        var newItem3 = Item()
-//        newItem3.itemName = "Find Mike3"
-//        itemArray.append(newItem3)
-        
         loadItems()
-        //        //stores item in users plist
-        //       if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
-        //           itemArray = items
-        //       }
+
     }
     
     
@@ -48,9 +31,7 @@ class TodoListViewController: UITableViewController{
         return cell
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //print(itemArray[indexPath.row])
-        
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {        
         itemArray[indexPath.row].checked = !itemArray[indexPath.row].checked
         saveItems()
         
