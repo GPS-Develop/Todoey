@@ -13,7 +13,7 @@ class TodoListViewController: UITableViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-                loadItems()
+        loadItems()
         
     }
     
@@ -45,19 +45,21 @@ class TodoListViewController: UITableViewController{
         var alertText = UITextField()
         
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
-            let newItem = Item(context: self.context)
-            newItem.title = alertText.text!
-            newItem.done = false
-            self.itemArray.append(newItem)
-            
-            self.saveItems()
+            if alertText.text != "" {
+                let newItem = Item(context: self.context)
+                newItem.title = alertText.text!
+                newItem.done = false
+                self.itemArray.append(newItem)
+                
+                self.saveItems()
+            }
         }
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create new item"
             alertText = alertTextField
         }
         alert.addAction(action)
-        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
     
@@ -81,7 +83,7 @@ class TodoListViewController: UITableViewController{
         tableView.reloadData()
     }
     
-
+    
 }
 
 //MARK: - UISearchBarDelegate
