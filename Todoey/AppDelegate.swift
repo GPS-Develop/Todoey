@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
  
     
     // MARK: - Core Data stack
- 
+ // we have this lazily loaded persistent container, so we only get loaded up, once we actually retrieve it or try to use it, and it's basically a new container that we create, that's all the type and it's persistent container, and it's created using the structure that we specified inside our data model, we'd have one entity called item and item has two attributes, a done, and a title. Then we load the persistent store and get it ready for use
     lazy var persistentContainer: NSPersistentContainer = {
  
         let container = NSPersistentContainer(name: "DataModel")
