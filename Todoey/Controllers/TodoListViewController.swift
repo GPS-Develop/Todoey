@@ -7,7 +7,6 @@ class TodoListViewController: UITableViewController{
     var itemArray = [Item]()
     
     let defaults = UserDefaults.standard
-    //Concept called context, and this goes into the app delegate and grabs the persistent container, and then we grab a reference to the context for that persistent container.
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     
@@ -32,12 +31,7 @@ class TodoListViewController: UITableViewController{
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-        //For example, if I click on this first row, then the index path dot row would be equal to zero, and I would go inside the item array which we know is a array of NS managed objects, and I would retrieve the first item inside that array, and then I would modify its done property or done attribute to be the opposite of what it used to be so True to False, false to true. And then I commit those changes, by using the Save items method, which simply commits the current state of the context, with the updated attribute to a persistent container.
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
-        //deleting from database order matters!!!
-//        context.delete(itemArray[indexPath.row])
-//        itemArray.remove(at: indexPath.row)
         saveItems()
         
         tableView.reloadData()
@@ -51,9 +45,6 @@ class TodoListViewController: UITableViewController{
         var alertText = UITextField()
         
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
-            //what will happen once the user clicks the Add Item button on our UIAlert
-            
-            // add a new item to our table view, we create a new object of type item, and remember this class gets automatically generated when we create a new entity with that name inside our data model and that class already has access to all the properties that we have specified and attributes title and done so we create a new item, and that item is an object of type, NS managed object
             let newItem = Item(context: self.context)
             newItem.title = alertText.text!
             newItem.done = false
@@ -81,13 +72,13 @@ class TodoListViewController: UITableViewController{
         self.tableView.reloadData()
     }
     
-    func loadItems(_: NSFetchRequest<Item> = Item.fetchRequest()) {
-        let request: NSFetchRequest<Item> = Item.fetchRequest()
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
         do {
             itemArray = try context.fetch(request)
         }catch {
             print("Error fetching data from context \(error)")
         }
+        tableView.reloadData()
     }
     
 
@@ -100,13 +91,16 @@ extension TodoListViewController: UISearchBarDelegate {
         request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
         
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-//
-//        do {
-//            itemArray = try context.fetch(request)
-//        }catch {
-//            print("Error fetching data from context \(error)")
-//        }
-        
-        loadItems(request)
+        loadItems(with: request)
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+            
+        }
     }
 }
