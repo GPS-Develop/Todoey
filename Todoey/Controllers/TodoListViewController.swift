@@ -5,6 +5,7 @@ import ChameleonFramework
 
 class TodoListViewController: SwipeTableViewController{
     
+    @IBOutlet weak var searchBar: UISearchBar!
     var todoItems: Results<Item>?
     let realm = try! Realm()
     var selectedCategory: Category? {
@@ -17,6 +18,31 @@ class TodoListViewController: SwipeTableViewController{
         super.viewDidLoad()
         //        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         tableView.separatorStyle = .none
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if let colorHex = selectedCategory?.hexColor{
+            
+            title = selectedCategory!.name
+            
+            guard let navBar = navigationController?.navigationBar else {
+                fatalError("Navigation controller does not exist")
+            }
+            if let bgColor = UIColor(hexString: colorHex) {
+                   navBar.backgroundColor = bgColor
+                   navBar.standardAppearance.backgroundColor = bgColor
+                   navBar.scrollEdgeAppearance?.backgroundColor = bgColor
+                   navBar.scrollEdgeAppearance?.largeTitleTextAttributes = [.foregroundColor: ContrastColorOf(bgColor, returnFlat: true)]
+                   navBar.standardAppearance.largeTitleTextAttributes = [.foregroundColor: ContrastColorOf(bgColor, returnFlat: true)]
+                navBar.tintColor = ContrastColorOf(bgColor, returnFlat: true)
+                navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: ContrastColorOf(bgColor, returnFlat: true)]
+                searchBar.barTintColor = bgColor
+                searchBar.searchTextField.backgroundColor = FlatWhite()
+
+            }
+            
+        }
     }
     
     // creates the number of cells

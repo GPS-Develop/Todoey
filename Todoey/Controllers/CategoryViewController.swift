@@ -18,11 +18,18 @@ class CategoryViewController: SwipeTableViewController{
     // We changed our categories from an array of category items to this new collection type, which is a collection of results that are category objects. And this is an optional, so that we can be safe.
     var categoryArray: Results<Category>?
     override func viewDidLoad() {
+        
         super.viewDidLoad()
-        //   print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-        //when our view first gets loaded up, we load up all of the categories that we currently own
+        
+        updateNavbarToDefault()
+
         loadCategories()
         tableView.separatorStyle = .none
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+
+        updateNavbarToDefault()
     }
     
     // we set that property categoryArray to look inside our realm and fetch all of the objects that belong to the category data type, and then we reload our table view with the new data.
@@ -121,6 +128,18 @@ class CategoryViewController: SwipeTableViewController{
         alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
         
         present(alert, animated: true, completion: nil)
+    }
+    
+    //MARK: - Resets Navbar to default blue
+    
+    func updateNavbarToDefault(){
+        let navBarAppearance = UINavigationBarAppearance()
+        navBarAppearance.configureWithOpaqueBackground()
+        navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        navBarAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        navBarAppearance.backgroundColor = UIColor.systemBlue
+        navigationController?.navigationBar.standardAppearance = navBarAppearance
+        navigationController?.navigationBar.scrollEdgeAppearance = navBarAppearance
     }
     
     
