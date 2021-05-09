@@ -8,17 +8,24 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
-class CategoryViewController: UITableViewController {
+class CategoryViewController: SwipeTableViewController{
     
+    // we initialize a new access point to our realm Database.
     let realm = try! Realm()
     
+    // We changed our categories from an array of category items to this new collection type, which is a collection of results that are category objects. And this is an optional, so that we can be safe.
     var categoryArray: Results<Category>?
     override func viewDidLoad() {
         super.viewDidLoad()
-//        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        //   print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        //when our view first gets loaded up, we load up all of the categories that we currently own
         loadCategories()
+        tableView.separatorStyle = .none
     }
+    
+    // we set that property categoryArray to look inside our realm and fetch all of the objects that belong to the category data type, and then we reload our table view with the new data.
     
     //MARK: - TableView Datasource Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -26,14 +33,19 @@ class CategoryViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let category = categoryArray?[indexPath.row]
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-        cell.textLabel?.text = category?.name ?? "No Categories added yet"
+        // taps into the cell that gets created inside the superView @ the current indexpath from SwipeTableViewController
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
+        cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No Categories added yet"
+        if let myHexColor = categoryArray?[indexPath.row].hexColor{
+            cell.backgroundColor = UIColor(hexString: myHexColor)
+            cell.textLabel?.textColor = ContrastColorOf(UIColor(hexString: myHexColor)!, returnFlat: true)
+        }
+        
         return cell
     }
     
     
-    //MARK: - TableView Datasource Methods
+    //MARK: - TableView Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "goToItems", sender: self)
@@ -48,10 +60,10 @@ class CategoryViewController: UITableViewController {
                 destinationVC.selectedCategory = categoryArray?[indexPath.row]
             }
         }
-
+        
     }
     //MARK: - Data Manipulation Methods
-
+    
     func save(category: Category) {
         
         do {
@@ -65,12 +77,27 @@ class CategoryViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
-    
     func loadCategories() {
         categoryArray = realm.objects(Category.self)
         tableView.reloadData()
-
+        
     }
+    
+    //MARK: - Delete Data From Swipe
+    
+    override func updateModel(at indexPath: IndexPath) {
+        if let item = self.categoryArray?[indexPath.row] {
+            do {
+                try self.realm.write{
+                    self.realm.delete(item.items)
+                    self.realm.delete(item)
+                }
+            } catch  {
+                print("Deleting category failed, \(error)")
+            }
+        }
+    }
+    
     
     //MARK: - Add New Categories
     
@@ -82,6 +109,7 @@ class CategoryViewController: UITableViewController {
             if textField.text != "" {
                 let newCategory = Category()
                 newCategory.name = textField.text!
+                newCategory.hexColor =  UIColor.randomFlat().hexValue()
                 self.save(category: newCategory)
             }
         }
@@ -91,18 +119,15 @@ class CategoryViewController: UITableViewController {
         }
         alert.addAction(action)
         alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
-
+        
         present(alert, animated: true, completion: nil)
     }
     
-   
+    
 }
 
 
 
 
 
-//MARK: - TableView Delegate Methods
-
-//MARK: - Data Manipulation Methods
 
